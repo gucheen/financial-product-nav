@@ -6,6 +6,7 @@
   line-height: 1.6;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; min-width: 320px; }
 button, input { font: inherit; }
 button { cursor: pointer; color: inherit; background: white; border: 1px solid #bbb; border-radius: 4px; padding: 6px 12px; }
@@ -18,7 +19,7 @@ h1 { font-size: 24px; }
 h2 { font-size: 16px; }
 h3 { font-size: 14px; }
 svg { flex-shrink: 0; vertical-align: middle; }
-.shell { max-width: 960px; margin: auto; padding: 0 24px; }
+.shell { width: 100%; padding: 0 clamp(24px, 3vw, 64px); }
 .page-nav { padding: 20px 0; border-bottom: 1px solid #ddd; }
 nav, .mode-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .nav-item { display: inline-flex; align-items: center; gap: 8px; }
@@ -38,7 +39,7 @@ main { padding: 24px 0; }
 .text-button { color: #2457b3; border: 0; padding: 4px 0; }
 .form-content, .result-content { padding: 20px 16px; }
 .field { display: block; margin-bottom: 16px; }
-.field > span { display: block; margin-bottom: 6px; }
+.field > span:not(.input-wrap) { display: block; margin-bottom: 6px; }
 .field em, .field small, .fee-toggle small { font-style: normal; font-size: 12px; color: #666; }
 .field em, .fee-toggle small { margin-left: 6px; }
 .field small { display: block; margin-top: 6px; }
@@ -54,7 +55,7 @@ main { padding: 24px 0; }
 .presets { margin-top: 8px; flex-wrap: wrap; }
 .date-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; }
 .date-note, .live-hint, .result-caption, .tag { font-size: 12px; color: #666; }
-.date-note > span { margin-left: auto; }
+.date-note > span:last-child { margin-left: auto; }
 .fee-section { border-top: 1px solid #ddd; padding-top: 16px; margin-top: 16px; }
 .fee-toggle { cursor: pointer; }
 .switch { width: 16px; height: 16px; accent-color: #2457b3; }

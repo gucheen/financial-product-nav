@@ -1,9 +1,10 @@
-# dependencies (bun install)
+# local dependencies
 node_modules
 
 # output
 out
 dist
+_site
 *.tgz
 
 # code coverage

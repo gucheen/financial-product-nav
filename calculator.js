@@ -1,27 +1,11 @@
-import Big from "big.js";
+import Big from "./vendor/big.mjs";
 
-export type Mode = "nav" | "profit" | "rate";
-export interface Inputs {
-  mode: Mode;
-  principal: string;
-  startNav: string;
-  endNav: string;
-  profit: string;
-  rate: string;
-  fees: boolean;
-  subscription: string;
-  redemption: string;
-  period: "dates" | "days";
-  startDate: string;
-  endDate: string;
-  days: string;
-}
-function decimal(value: string, label: string): Big {
+function decimal(value, label) {
   if (!value.trim() || !Number.isFinite(Number(value)))
     throw new Error(`请输入有效的${label}`);
   return new Big(value);
 }
-function dateValue(value: string): number {
+function dateValue(value) {
   const time = Date.parse(value + "T00:00:00Z");
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(value) ||
@@ -31,7 +15,7 @@ function dateValue(value: string): number {
     throw new Error("请输入有效的起止日期");
   return time;
 }
-export function holdingDays(input: Inputs): number {
+export function holdingDays(input) {
   const days =
     input.period === "days"
       ? Number(input.days)
@@ -40,12 +24,12 @@ export function holdingDays(input: Inputs): number {
     throw new Error("持有天数必须为正整数，结束日期须晚于开始日期");
   return days;
 }
-export function calculate(input: Inputs) {
+export function calculate(input) {
   const days = holdingDays(input);
-  let total: Big;
-  let netProfit: Big | null = null;
+  let total;
+  let netProfit = null;
   let fee = new Big(0);
-  let principal: Big | null = null;
+  let principal = null;
   if (input.mode === "rate") {
     total = decimal(input.rate, "区间收益率").div(100);
   } else {
@@ -101,4 +85,3 @@ export function calculate(input: Inputs) {
     fee: fee.toNumber(),
   };
 }
-export type Result = ReturnType<typeof calculate>;

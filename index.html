@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="根据净值变化、净收益或区间收益率计算单利与复利年化收益率，支持本地保存计算记录。">
+  <link rel="icon" type="image/svg+xml" href="./logo.svg">
+  <link rel="stylesheet" href="./style.css">
+  <title>年化 · 投资收益计算器</title>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="page-nav">
+      <nav aria-label="页面导航">
+        <button class="nav-item active" data-page="calculator" aria-current="page">年化计算器</button>
+        <button class="nav-item" data-page="history">计算记录 <span class="count" id="record-count"></span></button>
+        <button class="nav-item" data-page="guide">计算说明</button>
+      </nav>
+    </header>
+    <main>
+      <noscript><p class="error">请启用 JavaScript 以使用计算器。所有计算均在浏览器本地进行。</p></noscript>
+      <div class="page-heading">
+        <h1 id="page-title">年化收益计算器</h1>
+        <p id="page-description">从一段时间的净值或收益出发，轻松换算年化收益率。</p>
+      </div>
+      <section id="calculator-page" aria-label="年化计算器">
+        <div class="mode-grid" role="group" aria-label="输入方式">
+          <button class="mode-card selected" data-mode="nav" aria-pressed="true"><strong>净值变化</strong><small>基金、银行理财等净值型产品</small></button>
+          <button class="mode-card" data-mode="profit" aria-pressed="false"><strong>本金与收益</strong><small>存款、债券及已知收益的产品</small></button>
+          <button class="mode-card" data-mode="rate" aria-pressed="false"><strong>区间收益率</strong><small>将已有收益率换算为年化</small></button>
+        </div>
+        <div class="calculator-grid">
+          <section class="card input-card" aria-labelledby="input-title">
+            <div class="section-head"><h2 id="input-title">输入投资信息</h2><button class="text-button" id="reset">重置</button></div>
+            <form class="form-content" id="investment-form" novalidate>
+              <label class="field"><span>产品名称 <em>选填</em></span><span class="input-wrap"><input name="name" type="text" maxlength="60" placeholder="给这笔投资起个名字"></span></label>
+              <label class="field" data-modes="nav profit"><span>投入本金</span><span class="input-wrap"><input name="principal" type="number" step="any" required><span>元</span></span></label>
+              <div class="field-grid" data-modes="nav">
+                <label class="field"><span>期初净值</span><span class="input-wrap"><input name="startNav" type="number" step="any" required></span></label>
+                <label class="field"><span>期末净值</span><span class="input-wrap"><input name="endNav" type="number" step="any" required></span></label>
+              </div>
+              <label class="field" data-modes="profit" hidden><span>区间净收益</span><span class="input-wrap"><input name="profit" type="number" step="any" required><span>元</span></span><small>填入扣除全部费用后的收益，亏损请输入负数。</small></label>
+              <label class="field" data-modes="rate" hidden><span>区间收益率</span><span class="input-wrap"><input name="rate" type="number" step="any" required><span>%</span></span><small>填入整个持有期间的收益率，非已年化收益率。</small></label>
+              <div class="period-label">
+                <span>持有时间</span>
+                <div class="mini-tabs" role="group" aria-label="持有时间输入方式">
+                  <button type="button" data-period="days" class="on" aria-pressed="true">按天数</button>
+                  <button type="button" data-period="dates" aria-pressed="false">按日期</button>
+                </div>
+              </div>
+              <div id="days-fields">
+                <label class="input-wrap"><input aria-label="持有天数" name="days" type="number" min="1" step="1" required><span>天</span></label>
+                <div class="presets" role="group" aria-label="常用持有天数">
+                  <button type="button" data-days="7">7 天</button><button type="button" data-days="30">30 天</button><button type="button" data-days="90">90 天</button><button type="button" data-days="180">180 天</button><button type="button" data-days="365">1 年</button>
+                </div>
+              </div>
+              <div id="dates-fields" class="field-grid" hidden>
+                <label class="field"><span>开始日期</span><span class="input-wrap"><input name="startDate" type="date" required></span></label>
+                <label class="field"><span>结束日期</span><span class="input-wrap"><input name="endDate" type="date" required></span></label>
+              </div>
+              <div class="date-note"><span id="holding-days"></span><span>一年按 365 天计算</span></div>
+              <div class="fee-section" data-modes="nav">
+                <label class="fee-toggle"><span>计入交易费用 <small>申购费 / 赎回费</small></span><input class="switch" name="fees" type="checkbox"></label>
+                <div class="field-grid fees" id="fee-fields" hidden>
+                  <label class="field"><span>申购费率</span><span class="input-wrap"><input name="subscription" type="number" min="0" step="any" required><span>%</span></span></label>
+                  <label class="field"><span>赎回费率</span><span class="input-wrap"><input name="redemption" type="number" min="0" step="any" required><span>%</span></span></label>
+                </div>
+              </div>
+              <p class="live-hint">修改输入后，计算结果实时更新</p>
+            </form>
+          </section>
+          <section class="card result-card" aria-labelledby="result-title">
+            <div class="section-head"><h2 id="result-title">计算结果</h2><span class="tag" id="result-status">等待输入</span></div>
+            <div class="result-content">
+              <div class="result-top"><span>年化收益率</span><div class="method-tabs" role="group" aria-label="年化口径"><button data-method="compound" class="on" aria-pressed="true">复利</button><button data-method="simple" aria-pressed="false">单利</button></div></div>
+              <div aria-live="polite" aria-atomic="true"><div class="big-result" id="annual-result">—</div><p class="result-caption" id="result-caption"></p></div>
+              <div class="error" role="alert" id="error" hidden></div>
+              <div class="result-metrics"><div><span>区间收益率</span><strong id="total-result">—</strong></div><div><span>持有天数</span><strong id="days-result">—</strong></div></div>
+              <div class="result-details">
+                <div><span>区间净收益</span><strong id="profit-result">—</strong></div>
+                <div><span>期末资产金额</span><strong id="ending-result">—</strong></div>
+                <div data-modes="nav"><span>交易费用合计</span><strong id="fee-result">—</strong></div>
+              </div>
+              <div class="formula-box"><span>本次计算公式</span><code id="formula"></code></div>
+              <button class="save-button" id="save" disabled>保存本次计算</button>
+              <p class="notice" id="calculator-notice" role="status" hidden></p>
+            </div>
+          </section>
+        </div>
+        <div class="insight"><p>年化收益率是对历史区间收益的折算，不代表未来实际收益。持有时间越短，短期波动对年化结果的影响越大。</p><button class="text-button" data-page="guide">了解计算口径 →</button></div>
+      </section>
+      <section class="card history" id="history-page" aria-label="计算记录" hidden>
+        <div class="section-head"><h2>已保存的计算 <span class="tag" id="history-count">0 条</span></h2><button class="text-button" data-page="calculator">新建计算 →</button></div>
+        <div class="empty" id="empty-history"><h3>暂无计算记录</h3><p>保存一次计算后，即可在这里查看和重新载入。</p><button class="save-button" data-page="calculator">开始计算</button></div>
+        <div class="table-scroll" id="history-table" hidden>
+          <table><thead><tr><th scope="col">产品 / 计算方式</th><th scope="col">持有时间</th><th scope="col">区间收益率</th><th scope="col">年化收益率</th><th scope="col">操作</th></tr></thead><tbody id="records"></tbody></table>
+        </div>
+        <p class="history-note">记录仅保存在当前浏览器，最多保留最近 50 条；清除浏览器数据会删除记录。</p>
+        <p class="notice" id="history-notice" role="status" hidden></p>
+      </section>
+      <section class="guide-grid" id="guide-page" aria-label="计算说明" hidden>
+        <section class="card guide">
+          <h2>选择适合你的输入方式</h2>
+          <h3>净值变化</h3><p>适合没有期间申赎、分红或拆分的净值型产品。通过期初、期末净值计算收益，可按外扣法计入申购费及赎回费。</p>
+          <h3>本金与收益</h3><p>知道投入本金与区间净收益时使用。收益应包含期间利息、分红并扣除全部费用，亏损填负数。</p>
+          <h3>区间收益率</h3><p>已经知道持有期间的累计收益率时使用，无需输入本金。此模式不计算收益金额。</p>
+          <p class="guide-note">以上计算适用于单笔投入的区间收益。期间多次追加、赎回或分红再投资，需使用现金流或复权数据计算，本工具暂不支持。</p>
+        </section>
+        <section class="card guide">
+          <h2>两种年化口径</h2>
+          <h3>复利年化</h3><code>(1 + 区间收益率) ^ (365 / 天数) − 1</code><p>假设每个周期获得相同收益并再投资，用于比较复合增长速度。</p>
+          <h3>单利年化</h3><code>区间收益率 × 365 / 天数</code><p>不假设收益再投资，将区间收益按时间线性折算。</p>
+          <h3>时间与费用</h3><p>日期采用结束日期减开始日期，同日不计算，全年固定按 365 天。净值模式的份额为本金 ÷ (1 + 申购费率) ÷ 期初净值；期末资产扣除赎回费后再减本金得到净收益。金额与费用使用十进制计算，复利幂运算使用浮点近似。</p>
+          <a class="source-link" href="https://www.sec.gov/investor/tools/mfcc/rate-of-return-help.htm" target="_blank" rel="noreferrer">参考：SEC 收益率说明 ↗</a>
+        </section>
+      </section>
+      <footer><span>本地计算，数据不上传</span><span>计算结果仅供参考</span></footer>
+    </main>
+  </div>
+</body>
+</html>
