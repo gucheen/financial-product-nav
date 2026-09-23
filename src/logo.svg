@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-pinterest" width="250px" height="250px" viewBox="0 0 24 24" stroke-width="1.00" stroke="rgba(1, 1, 1, 1)" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="50%" cy="50%" r="50%" stroke="none" stroke-width="0" fill="rgba(255, 255, 255, 1)"/><g transform="translate(2.40, 2.40) scale(0.8)"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="8" y1="20" x2="12" y2="11"/><path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"/><circle cx="12" cy="12" r="9"/></g>
-  
-  
-  
-  
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#337654"/><path d="M10 10v21h21M14 24l6-7 6 3 6-10m-7 0h7v7" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>
